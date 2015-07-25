@@ -86,8 +86,21 @@ public class YamlRegionFile implements RegionDatabase {
         DumperOptions options = new DumperOptions();
         options.setIndent(4);
         options.setDefaultFlowStyle(FlowStyle.AUTO);
+        
+        Representer repr = new Representer();
+        repr.setPropertyUtils(new OrderedPropertyUtils());
 
-        ERROR_DUMP_YAML = new Yaml(new SafeConstructor(), new Representer(), options);
+        ERROR_DUMP_YAML = new Yaml(new SafeConstructor(), repr, options);
+    }
+    
+    private static class OrderedPropertyUtils extends PropertyUtils {
+        @Override
+        protected Set<Property> createPropertySet(Class<? extends Object> type, BeanAccess bAccess)
+                throws IntrospectionException {
+            Set<Property> result = new TreeSet<Property>();
+            result.addAll(super.createPropertySet(type, bAccess));
+            return result;
+        }
     }
 
     /**
